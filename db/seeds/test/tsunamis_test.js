@@ -1,5 +1,5 @@
-const sources = require('../../../public/assets/filteredSources.json');
-const waves = require('../../../public/assets/filteredWaves.json');
+const sources = require('../../../public/assets/sources_test.json');
+const waves = require('../../../public/assets/waves_test.json');
 
 const createSource = (knex, source) => {
   return knex('sources').insert({
@@ -7,7 +7,7 @@ const createSource = (knex, source) => {
     YEAR: source.YEAR,
     MONTH: source.MONTH,
     COUNTRY: source.COUNTRY,
-    STATEPROVINCE: source.STATEPROVINCE,
+    STATEPROVINCE: source['STATE/PROVINCE'],
     LOCATION: source.LOCATION,
     LATITUDE: source.LATITUDE,
     LONGITUDE: source.LONGITUDE,
