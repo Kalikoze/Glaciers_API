@@ -209,4 +209,15 @@ describe('API Routes', () => {
       });
     });
   });
+
+  describe('DELETE /api/v1/sources/:id', () => {
+    it('should delete a source', done => {
+      chai.request(server)
+      .delete('/api/v1/sources/5586')
+      .end((error, response) => {
+        response.should.have.status(204);
+        done();
+      });
+    });
+  });
 });
