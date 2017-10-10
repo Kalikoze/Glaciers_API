@@ -42,8 +42,25 @@ app.get('/api/v1/waves/:id', (request, response) => {
     .catch(error => response.status(500).json({error}));
 });
 
+app.post('/api/v1/sources/', (request, response) => {
+  const source = request.body;
+  const keys = ['SOURCE_ID', 'YEAR', 'MONTH', 'COUNTRY', 'STATEPROVINCE', 'LOCATION', 'LATITUDE', 'LONGITUDE', 'MAXIMUM_HEIGHT', 'FATALITIES', 'FATALITY_ESTIMATE', 'ALL_DAMAGE_MILLIONS', 'DAMAGE_ESTIMATE'];
+
+  for(let requiredParameter of keys) {
+  if (!source[requiredParameter]) {
+    return response.status(422)
+      .send({ error: `Expected format: { 'SOURCE_ID': <String>, 'YEAR': <String>, 'MONTH': <String>, 'COUNTRY': <String>, 'STATEPROVINCE': <String>, 'LOCATION': <String>, 'LATITUDE': <string>, 'LONGITUDE': <string>, 'MAXIMUM_HEIGHT': <String>, 'FATALITIES': <string>, 'FATALITY_ESTIMATE': <String>, 'ALL_DAMAGE_MILLIONS': <String>, 'DAMAGE_ESTIMATE': <String> }. You're missing a ${requiredParameter} property.` });
+    };
+  };
+
+  database('sources').insert(source, '*')
+    .then(source => response.status(201).json(source))
+    .catch(error => response.status(500).json({error}));
+})
+
+
 app.listen(app.get('port'), () => {
-  console.log(`Palette Picker is running on ${app.get('port')}.`);
+  console.log(`Tsunami API is running on ${app.get('port')}.`);
 });
 
 module.exports = app
