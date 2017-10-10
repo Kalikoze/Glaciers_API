@@ -56,7 +56,23 @@ app.post('/api/v1/sources/', (request, response) => {
   database('sources').insert(source, '*')
     .then(source => response.status(201).json(source))
     .catch(error => response.status(500).json({error}));
-})
+});
+
+app.post('/api/v1/waves/', (request, response) => {
+  const wave = request.body;
+  const keys = ['WAVE_ID', 'SOURCE_ID', 'YEAR', 'MONTH', 'LOCATION', 'MAXIMUM_HEIGHT', 'FATALITIES', 'FATALITY_ESTIMATE', 'ALL_DAMAGE_MILLIONS', 'DAMAGE_ESTIMATE'];
+
+  for(let requiredParameter of keys) {
+  if (!wave[requiredParameter]) {
+    return response.status(422)
+      .send({ error: `Expected format: { 'WAVE_ID': <String>, 'SOURCE_ID': <String>, 'YEAR': <String>, 'MONTH': <String>, 'LOCATION': <String>, 'MAXIMUM_HEIGHT': <String>, 'FATALITIES': <string>, 'FATALITY_ESTIMATE': <String>, 'ALL_DAMAGE_MILLIONS': <String>, 'DAMAGE_ESTIMATE': <String> }. You're missing a ${requiredParameter} property.` });
+    };
+  };
+
+  database('waves').insert(wave, '*')
+    .then(wave => response.status(201).json(wave))
+    .catch(error => response.status(500).json({error}));
+});
 
 
 app.listen(app.get('port'), () => {
