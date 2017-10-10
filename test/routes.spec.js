@@ -167,4 +167,46 @@ describe('API Routes', () => {
       });
     });
   });
+
+  describe('POST /api/v1/waves', () => {
+    const mockData = {
+      'WAVE_ID': '41232',
+      'SOURCE_ID': '5586',
+      'YEAR': '2011',
+      'MONTH': '2',
+      'LOCATION': 'QUEEN\'S WHARF',
+      'MAXIMUM_HEIGHT': '0.07',
+      'FATALITIES': '345',
+      'FATALITY_ESTIMATE': '3232',
+      'ALL_DAMAGE_MILLIONS': '3382',
+      'DAMAGE_ESTIMATE': '2',
+    }
+
+    it('should create a new wave', done => {
+      chai.request(server)
+      .post('/api/v1/waves')
+      .send(mockData)
+      .end((error, response) => {
+        const index = response.body.findIndex(obj => obj.SOURCE_ID === mockData.SOURCE_ID)
+        response.should.have.status(201);
+        response.body.should.be.a('array');
+        response.body[index].should.include(mockData);
+        done();
+      });
+    });
+
+    it('should not create a wave with missing data', done => {
+      chai.request(server)
+      .post('/api/v1/waves')
+      .send({
+        'WAVE_ID': '324521',
+        'DAMAGE_ESTIMATE': '34235',
+      })
+      .end((error, response) => {
+        response.should.have.status(422);
+        response.body.error.should.equal(`Expected format: { 'WAVE_ID': <String>, 'SOURCE_ID': <String>, 'YEAR': <String>, 'MONTH': <String>, 'LOCATION': <String>, 'MAXIMUM_HEIGHT': <String>, 'FATALITIES': <string>, 'FATALITY_ESTIMATE': <String>, 'ALL_DAMAGE_MILLIONS': <String>, 'DAMAGE_ESTIMATE': <String> }. You're missing a SOURCE_ID property.`);
+        done();
+      });
+    });
+  });
 });
