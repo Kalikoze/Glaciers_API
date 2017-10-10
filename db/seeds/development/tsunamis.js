@@ -1,5 +1,5 @@
-const sources = require('../../../public/assets/sources.json');
-const waves = require('../../../public/assets/waves.json');
+const sources = require('../../../public/assets/filteredSources.json');
+const waves = require('../../../public/assets/filteredWaves.json');
 
 const createSource = (knex, source) => {
   return knex('sources').insert({
