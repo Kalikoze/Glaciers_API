@@ -45,42 +45,70 @@ describe('API Routes', () => {
 
   describe('GET /api/v1/sources', () => {
     it('should get all of the sources', done => {
+      const mockData = {
+        'SOURCE_ID': '5586',
+        'YEAR': '551',
+        'MONTH': '7',
+        'COUNTRY': 'GREECE',
+        'STATEPROVINCE': '',
+        'LOCATION': '',
+        'LATITUDE': '38.4',
+        'LONGITUDE': '22.3',
+        'MAXIMUM_HEIGHT': '',
+        'FATALITIES': '',
+        'FATALITY_ESTIMATE': '',
+        'ALL_DAMAGE_MILLIONS': '',
+        'DAMAGE_ESTIMATE': '',
+      }
+
       chai.request(server)
       .get('/api/v1/sources')
       .end((error, response) => {
+        const index = response.body.findIndex(obj => obj.SOURCE_ID === mockData.SOURCE_ID)
         response.should.have.status(200);
         response.should.be.json;
         response.body.should.be.a('array');
         response.body.length.should.equal(3);
-        response.body[0].should.have.property('SOURCE_ID');
-        response.body[0].SOURCE_ID.should.equal('5586');
-        response.body[0].should.have.property('YEAR');
-        response.body[0].YEAR.should.equal('551');
-        response.body[0].should.have.property('MONTH');
-        response.body[0].MONTH.should.equal('7');
-        response.body[0].should.have.property('COUNTRY');
-        response.body[0].COUNTRY.should.equal('GREECE');
-        response.body[0].should.have.property('STATEPROVINCE');
-        response.body[0].STATEPROVINCE.should.equal('');
-        response.body[0].should.have.property('LOCATION');
-        response.body[0].LOCATION.should.equal('');
-        response.body[0].should.have.property('LATITUDE');
-        response.body[0].LATITUDE.should.equal('38.4');
-        response.body[0].should.have.property('LONGITUDE');
-        response.body[0].LONGITUDE.should.equal('22.3');
-        response.body[0].should.have.property('MAXIMUM_HEIGHT');
-        response.body[0].MAXIMUM_HEIGHT.should.equal('');
-        response.body[0].should.have.property('FATALITIES');
-        response.body[0].FATALITIES.should.equal('');
-        response.body[0].should.have.property('FATALITY_ESTIMATE');
-        response.body[0].FATALITY_ESTIMATE.should.equal('');
-        response.body[0].should.have.property('ALL_DAMAGE_MILLIONS');
-        response.body[0].ALL_DAMAGE_MILLIONS.should.equal('');
-        response.body[0].should.have.property('DAMAGE_ESTIMATE');
-        response.body[0].DAMAGE_ESTIMATE.should.equal('');
+        response.body[index].should.include(mockData);
         done();
       });
     });
 
+    it('should return a 404 status if the url is invalid', done => {
+      chai.request(server)
+      .get('/api/v1/foo')
+      .end((error, response) => {
+        response.should.have.status(404);
+        done();
+      });
+    });
   });
+
+  describe('GET /api/v1/waves', () => {
+    it('should get all of the waves', done => {
+      const mockData = { WAVE_ID: '28689',
+        SOURCE_ID: '5586',
+        YEAR: '2013',
+        MONTH: '8',
+        LOCATION: 'QUEEN\'S WHARF',
+        MAXIMUM_HEIGHT: '0.07',
+        FATALITIES: '',
+        FATALITY_ESTIMATE: '',
+        ALL_DAMAGE_MILLIONS: null,
+        DAMAGE_ESTIMATE: '',
+      }
+
+      chai.request(server)
+      .get('/api/v1/waves')
+      .end((error, response) => {
+        const index = response.body.findIndex(obj => obj.WAVE_ID === mockData.WAVE_ID)
+        response.should.have.status(200);
+        response.should.be.json;
+        response.body.should.be.a('array')
+        response.body.length.should.equal(3);
+        response.body[index].should.include(mockData)
+        done();
+      })
+    })
+  })
 });
