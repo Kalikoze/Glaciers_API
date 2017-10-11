@@ -294,6 +294,29 @@ describe('API Routes', () => {
           response.body.patchedSource.should.be.a('object');
           response.body.patchedSource.should.have.property('LOCATION');
           response.body.patchedSource.LOCATION.should.equal('DENVER');
+          response.body.patchedSource.YEAR.should.equal('551');
+          done();
+        });
+    });
+  });
+
+  describe('PATCH /api/v1/waves', () => {
+    const update = {
+      LOCATION: 'DENVER',
+    };
+
+    it('should update source object', (done) => {
+      chai
+        .request(server)
+        .patch('/api/v1/waves/28689')
+        .send(update)
+        .end((error, response) => {
+          console.log('response body', response.body);
+          response.should.have.status(200);
+          response.body.should.be.a('object');
+          response.body.should.have.property('LOCATION');
+          response.body.LOCATION.should.equal('DENVER');
+          response.body.YEAR.should.equal('2013');
           done();
         });
     });

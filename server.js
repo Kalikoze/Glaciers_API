@@ -178,6 +178,24 @@ app.patch('/api/v1/sources/:id', (request, response) => {
     .catch(error => response.status(500).json({ error }));
 });
 
+app.patch('/api/v1/waves/:id', (request, response) => {
+  const wavePatch = request.body;
+  const { id } = request.params;
+
+  database('waves')
+    .where('WAVE_ID', id)
+    .update(wavePatch, '*')
+    .then((update) => {
+      if (!update.length) {
+        response.status(404).json({
+          error: `Cannot find Wave with ID of ${id}`,
+        });
+      }
+      response.status(200).json(update[0]);
+    })
+    .catch(error => response.status(500).json({ error }));
+});
+
 app.listen(app.get('port'), () => {
   console.log(`Tsunami API is running on ${app.get('port')}.`);
 });
