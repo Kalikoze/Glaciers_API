@@ -64,7 +64,9 @@ app.get('api/v1/waves?YEAR=:year', (request, response) => {
       (!wave.length
         ? response
           .status(404)
-          .json({ error: 'This Database only Contains Tsunami Data from 2010 until 2017' })
+          .json({
+            error: `This Database only Contains Tsunami Data from 2013 until 2017, you searched for ${year}`,
+          })
         : response.status(200).json(wave)));
 });
 
@@ -141,7 +143,7 @@ app.delete('/api/v1/sources/:id', (request, response) => {
         .del()
         .then(deleted =>
           (!deleted
-            ? response.status(404).json({ error: 'Could not be found.' })
+            ? response.status(404).json({ error: `Cannot find Source with ID of ${id}` })
             : response.sendStatus(204)))
         .catch(error => response.status(500).json({ error }));
     });
@@ -155,7 +157,7 @@ app.delete('/api/v1/waves/:id', (request, response) => {
     .del()
     .then(deleted =>
       (!deleted
-        ? response.status(404).json({ error: 'Could not be found.' })
+        ? response.status(404).json({ error: `Cannot find Wave with ID of ${id}` })
         : response.sendStatus(204)))
     .catch(error => response.status(500).json({ error }));
 });
@@ -173,7 +175,7 @@ app.patch('/api/v1/sources/:id', (request, response) => {
           error: `Cannot find Source with ID of ${id}`,
         });
       }
-      response.status(200).json({ patchedSource: update[0] });
+      response.status(200).json(update[0]);
     })
     .catch(error => response.status(500).json({ error }));
 });

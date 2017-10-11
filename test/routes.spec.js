@@ -160,6 +160,17 @@ describe('API Routes', () => {
           done();
         });
     });
+
+    it('should return a 404 status if searching for a year that is not between 2013 and 2017', (done) => {
+      chai
+        .request(server)
+        .get('/api/v1/pizza')
+        .end((error, response) => {
+          response.should.have.status(404);
+          response.body.error.should.equal('This Database only Contains Tsunami Data from 2013 until 2017, you searched for pizza');
+          done();
+        });
+    });
   });
 
   describe('POST /api/v1/sources', () => {
@@ -264,6 +275,17 @@ describe('API Routes', () => {
           done();
         });
     });
+
+    it('should return a 404 error if an invalid ID is passed', (done) => {
+      chai
+        .request(server)
+        .delete('/api/v1/sources/pizza')
+        .end((error, response) => {
+          response.should.have.status(404);
+          response.body.error.should.equal('Cannot find Source with ID of pizza');
+          done();
+        });
+    });
   });
 
   describe('DELETE /api/v1/waves/:id', () => {
@@ -273,6 +295,17 @@ describe('API Routes', () => {
         .delete('/api/v1/waves/28689')
         .end((error, response) => {
           response.should.have.status(204);
+          done();
+        });
+    });
+
+    it('should return a 404 error if an invalid ID is passed', (done) => {
+      chai
+        .request(server)
+        .delete('/api/v1/waves/pizza')
+        .end((error, response) => {
+          response.should.have.status(404);
+          response.body.error.should.equal('Cannot find Wave with ID of pizza');
           done();
         });
     });
@@ -289,18 +322,30 @@ describe('API Routes', () => {
         .patch('/api/v1/sources/5586')
         .send(update)
         .end((error, response) => {
-          console.log('response body', response.body.patchedSource);
+          console.log('response body', response.body);
           response.should.have.status(200);
-          response.body.patchedSource.should.be.a('object');
-          response.body.patchedSource.should.have.property('LOCATION');
-          response.body.patchedSource.LOCATION.should.equal('DENVER');
-          response.body.patchedSource.YEAR.should.equal('551');
+          response.body.should.be.a('object');
+          response.body.should.have.property('LOCATION');
+          response.body.LOCATION.should.equal('DENVER');
+          response.body.YEAR.should.equal('551');
+          done();
+        });
+    });
+
+    it('should return a 404 error if an invalid ID is passed', (done) => {
+      chai
+        .request(server)
+        .patch('/api/v1/sources/pizza')
+        .send(update)
+        .end((error, response) => {
+          response.should.have.status(404);
+          response.body.error.should.equal('Cannot find Source with ID of pizza');
           done();
         });
     });
   });
 
-  describe('PATCH /api/v1/waves', () => {
+  describe('PATCH /api/v1/waves/:id', () => {
     const update = {
       LOCATION: 'DENVER',
     };
@@ -317,6 +362,18 @@ describe('API Routes', () => {
           response.body.should.have.property('LOCATION');
           response.body.LOCATION.should.equal('DENVER');
           response.body.YEAR.should.equal('2013');
+          done();
+        });
+    });
+
+    it('should return a 404 error if an invalid ID is passed', (done) => {
+      chai
+        .request(server)
+        .patch('/api/v1/waves/gummi-worms')
+        .send(update)
+        .end((error, response) => {
+          response.should.have.status(404);
+          response.body.error.should.equal('Cannot find Wave with ID of gummi-worms');
           done();
         });
     });
