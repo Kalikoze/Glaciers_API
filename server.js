@@ -77,9 +77,11 @@ app.post('/api/v1/waves/', (request, response) => {
 app.delete('/api/v1/sources/:id', (request, response) => {
   const { id } = request.params;
 
-  database('sources').where({SOURCE_ID: id}).del()
+  database('waves').where({SOURCE_ID: id}).del().then(() => {
+    database('sources').where({SOURCE_ID: id}).del()
     .then(deleted => !deleted ? response.status(404).json({error: "Could not be found."}) : response.sendStatus(204))
     .catch(error => response.status(500).json({error}));
+  })
 });
 
 app.delete('/api/v1/waves/:id', (request, response) => {
