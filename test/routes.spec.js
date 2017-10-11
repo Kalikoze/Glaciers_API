@@ -32,7 +32,8 @@ describe('Client Routes', () => {
 
 describe('API Routes', () => {
   before(done => {
-    database.migrate.latest()
+    database.migrate.rollback().
+    then(()=> database.migrate.latest())
     .then(() => done())
     .catch(error => console.log(error))
   });
@@ -121,6 +122,33 @@ describe('API Routes', () => {
       });
     });
   });
+
+  describe('GET /api/v1/waves?YEAR=:year', () => {
+    it('should return waves from a specific year', done => {
+      const mockData = {
+        'WAVE_ID': '28689',
+        'SOURCE_ID': '5586',
+        'YEAR': '2013',
+        'MONTH': '8',
+        'LOCATION': 'QUEEN\'S WHARF',
+        'MAXIMUM_HEIGHT': '0.07',
+        'FATALITIES': '',
+        'FATALITY_ESTIMATE': '',
+        'ALL_DAMAGE_MILLIONS': null,
+        'DAMAGE_ESTIMATE': '',
+      }
+
+      chai.request(server).get('/api/v1/waves?YEAR=2013')
+      .end((error, response) => {
+        const index = response.body.findIndex(obj => obj.WAVE_ID === mockData.WAVE_ID)
+
+        response.body.length.should.equal(2);
+        response.body.should.be.a('array');
+        response.body[index].should.include(mockData);
+        done()
+      })
+    })
+  })
 
   describe('POST /api/v1/sources', () => {
     it('should create a new source', done => {
@@ -222,7 +250,7 @@ describe('API Routes', () => {
   });
 
   describe('DELETE /api/v1/waves/:id', () => {
-    it('should delete a source', done => {
+    it('should delete a wave', done => {
       chai.request(server)
       .delete('/api/v1/waves/28689')
       .end((error, response) => {
@@ -232,4 +260,20 @@ describe('API Routes', () => {
     });
   });
 
+  describe('PATCH /api/v1/sources', () => {
+    const update = {
+      'SOURCE_ID': '5586',
+      'MAXIMUM_HEIGHT': '999',
+    }
+
+    it('should update source object', done => {
+      chai.request(server)
+      .patch('/api/v1/sources/5586')
+      .send(update)
+      .end((error, response) => {
+
+        done();
+      });
+    });
+  });
 });

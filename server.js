@@ -42,6 +42,12 @@ app.get('/api/v1/waves/:id', (request, response) => {
     .catch(error => response.status(500).json({error}));
 });
 
+app.get('api/v1/waves?YEAR=:year', (request, response) => {
+  const { year } = request.params;
+  database('waves').where({YEAR: year}).select()
+    .then(wave => !wave.length ? response.status(404).json({error: 'This Database only Contains Tsunami Data from 2010 until 2017'}) : response.status(200).json(wave))
+})
+
 app.post('/api/v1/sources/', (request, response) => {
   const source = request.body;
   const keys = ['SOURCE_ID', 'YEAR', 'MONTH', 'COUNTRY', 'STATEPROVINCE', 'LOCATION', 'LATITUDE', 'LONGITUDE', 'MAXIMUM_HEIGHT', 'FATALITIES', 'FATALITY_ESTIMATE', 'ALL_DAMAGE_MILLIONS', 'DAMAGE_ESTIMATE'];
@@ -91,6 +97,17 @@ app.delete('/api/v1/waves/:id', (request, response) => {
     .then(deleted => !deleted ? response.status(404).json({error: "Could not be found."}) : response.sendStatus(204))
     .catch(error => response.status(500).json({error}));
 });
+
+app.patch('/api/v1/sources/:id', (request, response) => {
+  const { id } = request.params;
+  const propUpdate = request.body;
+  const propKeys = Object.keys(propUpdate);
+  const prop = propKeys[1]
+  const updateValue = propUpdate[prop]
+
+  database('sources').where({SOURCE_ID: id}).update({prop: updateValue}).then(updated => !updated ? response.status(404).json({error: 'Must receive SOURCE_ID and the prop to update'}) : response.sendStatus(200))
+  .catch(error => response.status(500).json({error}))
+})
 
 app.listen(app.get('port'), () => {
   console.log(`Tsunami API is running on ${app.get('port')}.`);
