@@ -3,9 +3,20 @@
   <head>
     <meta charset="utf-8">
     <title>Tsunamis API</title>
+    <link href="css/styles.css" rel="stylesheet" type='text/css'>
   </head>
   <body>
     <h1>Tsunamis API</h1>
-
+    <form class="" action="/api/v1/newuser/authenticate" method="post">
+      <label for="POST-appname">Create App Name</label>
+        <input id="POST-appname" type="text" name="appname" placeholder="Create App Name...">
+      <label for="POST-email">Create Email Address</label>
+        <input id="POST-email" type="text" name="email" placeholder="Create Email Address...">
+    </form>
+    <section class='web-token'>
+      <p class="token">Web Token Here...</p>
+    </section>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="js/scripts.js" charset="utf-8"></script>
   </body>
 </html>
