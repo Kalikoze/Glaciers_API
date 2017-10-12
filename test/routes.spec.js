@@ -35,12 +35,20 @@ describe('Client Routes', () => {
 });
 
 describe('API Routes', () => {
+  let token
+
   before((done) => {
     database.migrate
       .rollback()
       .then(() => database.migrate.latest())
       .then(() => done())
       .catch(error => console.log(error));
+
+      chai
+        .request(server)
+        .post('/api/v1/newuser/authenticate')
+        .send({appName: 'Cool App', email: 'travis@turing.io'})
+        .end((error, response) => token = JSON.parse(response.text).token)
   });
 
   beforeEach((done) => {
@@ -194,6 +202,7 @@ describe('API Routes', () => {
       chai
         .request(server)
         .post('/api/v1/sources')
+        .set('Authorization', token)
         .send(mockData)
         .end((error, response) => {
           const index = response.body.findIndex(obj => obj.SOURCE_ID === mockData.SOURCE_ID);
@@ -208,6 +217,7 @@ describe('API Routes', () => {
       chai
         .request(server)
         .post('/api/v1/sources')
+        .set('Authorization', token)
         .send({
           YEAR: '221',
           LONGITUDE: '45.3',
@@ -239,6 +249,7 @@ describe('API Routes', () => {
       chai
         .request(server)
         .post('/api/v1/waves')
+        .set('Authorization', token)
         .send(mockData)
         .end((error, response) => {
           const index = response.body.findIndex(obj => obj.SOURCE_ID === mockData.SOURCE_ID);
@@ -253,6 +264,7 @@ describe('API Routes', () => {
       chai
         .request(server)
         .post('/api/v1/waves')
+        .set('Authorization', token)
         .send({
           WAVE_ID: '324521',
           DAMAGE_ESTIMATE: '34235',
@@ -270,6 +282,7 @@ describe('API Routes', () => {
       chai
         .request(server)
         .delete('/api/v1/sources/5586')
+        .set('Authorization', token)
         .end((error, response) => {
           response.should.have.status(204);
           done();
@@ -280,6 +293,7 @@ describe('API Routes', () => {
       chai
         .request(server)
         .delete('/api/v1/sources/pizza')
+        .set('Authorization', token)
         .end((error, response) => {
           response.should.have.status(404);
           response.body.error.should.equal('Cannot find Source with ID of pizza');
@@ -293,6 +307,7 @@ describe('API Routes', () => {
       chai
         .request(server)
         .delete('/api/v1/waves/28689')
+        .set('Authorization', token)
         .end((error, response) => {
           response.should.have.status(204);
           done();
@@ -303,6 +318,7 @@ describe('API Routes', () => {
       chai
         .request(server)
         .delete('/api/v1/waves/pizza')
+        .set('Authorization', token)
         .end((error, response) => {
           response.should.have.status(404);
           response.body.error.should.equal('Cannot find Wave with ID of pizza');
@@ -320,9 +336,9 @@ describe('API Routes', () => {
       chai
         .request(server)
         .patch('/api/v1/sources/5586')
+        .set('Authorization', token)
         .send(update)
         .end((error, response) => {
-          console.log('response body', response.body);
           response.should.have.status(200);
           response.body.should.be.a('object');
           response.body.should.have.property('LOCATION');
@@ -336,6 +352,7 @@ describe('API Routes', () => {
       chai
         .request(server)
         .patch('/api/v1/sources/pizza')
+        .set('Authorization', token)
         .send(update)
         .end((error, response) => {
           response.should.have.status(404);
@@ -354,9 +371,9 @@ describe('API Routes', () => {
       chai
         .request(server)
         .patch('/api/v1/waves/28689')
+        .set('Authorization', token)
         .send(update)
         .end((error, response) => {
-          console.log('response body', response.body);
           response.should.have.status(200);
           response.body.should.be.a('object');
           response.body.should.have.property('LOCATION');
@@ -371,6 +388,7 @@ describe('API Routes', () => {
         .request(server)
         .patch('/api/v1/waves/gummi-worms')
         .send(update)
+        .set('Authorization', token)
         .end((error, response) => {
           response.should.have.status(404);
           response.body.error.should.equal('Cannot find Wave with ID of gummi-worms');
