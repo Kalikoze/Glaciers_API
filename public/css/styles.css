@@ -28,7 +28,7 @@ h1 {
   width: 100%;
 }
 
-form {
+section.form {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -48,7 +48,7 @@ form {
 #POST-appname, #POST-email {
   border: none;
   border-radius: 20px;
-  margin-top: -325px;
+  margin-top: -280px;
   padding-left: 10px;
 }
 
@@ -56,7 +56,24 @@ label {
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 20px;
-  padding: 10px;
+  padding: 5px;
+}
+
+button {
+  background-color: rgba(0, 0, 0, 0.8);
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 32px;
+  height: 50px;
+  margin-top: -270px;
+  cursor: pointer;
+  width: 500px;
+}
+
+button:hover {
+  background-color: white;
+  color: black;
 }
 
 .web-token {
@@ -65,6 +82,7 @@ label {
   border-radius: 20px;
   height: 30%;
   margin-top: -200px;
+  overflow-wrap: break-word;
   width: 80%;
 }
 
@@ -72,4 +90,5 @@ label {
   color: white;
   font-size: 32px;
   padding: 20px;
+  width: 100%;
 }

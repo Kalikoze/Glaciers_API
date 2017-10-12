@@ -85,10 +85,12 @@ app.post('/api/v1/newuser/authenticate', (request, response) => {
   const { email, appName } = request.body;
 
   if(!email || !appName) {
-    return response.status(422).json({error: `Email and appName required.`})
+    return response.status(422).json({error: `An App Name and Email are required.`})
   }
 
-  jwt.sign(request.body, secretKey, {expiresIn: "48h"}, (error, token) => {
+  const accountAuth = email.includes('turing.io') ? Object.assign(request.body, {admin: true}) : Object.assign(request.body, {admin: false})
+
+  jwt.sign(accountAuth, secretKey, {expiresIn: "48h"}, (error, token) => {
     token ? response.status(200).json({ token }) : response.status(404).json({error})
   });
 })
