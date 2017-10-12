@@ -3,10 +3,13 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
+const key = require('./key')
+const secretKey = process.env.secretKey || key
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -14,6 +17,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
 app.set('port', process.env.PORT || 3000);
+
+const checkAuth = (request, response, next) => {
+  const token = request.headers.authorization;
+
+  if (!token) {
+    return response.status(403).json({error: 'You must be authorized to hit this endpoint.'})
+  }
+
+  jwt.verify(token, secretKey, (error, decoded) => {
+    if (error) {
+      return response.status(403).json({error: "Invalid token"});
+    };
+
+    decoded.email.includes('turing.io') ? next() : response.status(403).json({error: "Invalid email."})
+  });
+};
 
 app.get('/api/v1/sources', (request, response) => {
   database('sources')
@@ -62,8 +81,21 @@ app.get('/api/v1/waves/:id', (request, response) => {
     .catch(error => response.status(500).json({ error }));
 });
 
-app.post('/api/v1/sources/', (request, response) => {
+app.post('/api/v1/newuser/authenticate', (request, response) => {
+  const { email, appName } = request.body;
+
+  if(!email || !appName) {
+    return response.status(422).json({error: `Email and appName required.`})
+  }
+
+  jwt.sign(request.body, secretKey, {expiresIn: "48h"}, (error, token) => {
+    token ? response.status(200).json({ token }) : response.status(404).json({error})
+  });
+})
+
+app.post('/api/v1/sources/', checkAuth, (request, response) => {
   const source = request.body;
+
   const keys = [
     'SOURCE_ID',
     'YEAR',
@@ -94,8 +126,9 @@ app.post('/api/v1/sources/', (request, response) => {
     .catch(error => response.status(500).json({ error }));
 });
 
-app.post('/api/v1/waves/', (request, response) => {
+app.post('/api/v1/waves/', checkAuth, (request, response) => {
   const wave = request.body;
+
   const keys = [
     'WAVE_ID',
     'SOURCE_ID',
@@ -123,7 +156,7 @@ app.post('/api/v1/waves/', (request, response) => {
     .catch(error => response.status(500).json({ error }));
 });
 
-app.delete('/api/v1/sources/:id', (request, response) => {
+app.delete('/api/v1/sources/:id', checkAuth, (request, response) => {
   const { id } = request.params;
 
   database('waves')
@@ -141,7 +174,7 @@ app.delete('/api/v1/sources/:id', (request, response) => {
     });
 });
 
-app.delete('/api/v1/waves/:id', (request, response) => {
+app.delete('/api/v1/waves/:id', checkAuth, (request, response) => {
   const { id } = request.params;
 
   database('waves')
