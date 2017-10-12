@@ -187,7 +187,7 @@ app.delete('/api/v1/waves/:id', checkAuth, (request, response) => {
     .catch(error => response.status(500).json({ error }));
 });
 
-app.patch('/api/v1/sources/:id', (request, response) => {
+app.patch('/api/v1/sources/:id', checkAuth, (request, response) => {
   const sourcePatch = request.body;
   const { id } = request.params;
 
@@ -205,7 +205,7 @@ app.patch('/api/v1/sources/:id', (request, response) => {
     .catch(error => response.status(500).json({ error }));
 });
 
-app.patch('/api/v1/waves/:id', (request, response) => {
+app.patch('/api/v1/waves/:id', checkAuth, (request, response) => {
   const wavePatch = request.body;
   const { id } = request.params;
 

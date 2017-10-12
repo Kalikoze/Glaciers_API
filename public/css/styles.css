@@ -1,0 +1,75 @@
+*,
+*:after,
+*:before {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  align-items: center;
+  background-image: url('../assets/tsunami.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  flex-wrap: wrap;
+  height: 100vh;
+  justify-content: center;
+  width: 100%;
+}
+
+h1 {
+  align-items: center;
+  color: white;
+  display: flex;
+  font-size: 64px;;
+  height: 20%;
+  justify-content: center;
+  width: 100%;
+}
+
+form {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  height: 50%;
+  justify-content: center;
+  width: 100%;
+}
+
+#POST-appname, #POST-email, label {
+  display: block;
+  font-size: 24px;
+  height: 70px;
+  margin-top: -200px;
+  width: 70%;
+}
+
+#POST-appname, #POST-email {
+  border: none;
+  border-radius: 20px;
+  margin-top: -325px;
+  padding-left: 10px;
+}
+
+label {
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+  padding: 10px;
+}
+
+.web-token {
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+  height: 30%;
+  margin-top: -200px;
+  width: 80%;
+}
+
+.token {
+  color: white;
+  font-size: 32px;
+  padding: 20px;
+}
