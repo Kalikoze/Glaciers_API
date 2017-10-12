@@ -7,10 +7,6 @@ const path = require('path');
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
-const sources = require('./public/assets/filteredSources.json')
-const waves = require('./public/assets/filteredWaves.json')
-
-console.log(waves.length)
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -40,6 +36,13 @@ app.get('/api/v1/sources/:id', (request, response) => {
 });
 
 app.get('/api/v1/waves', (request, response) => {
+  if(request.query.year) {
+    const { year } = request.query
+    return database('waves').select().where('YEAR', year)
+      .then(waves => waves.length ? response.status(200).json(waves) : response.status(404).json({error: `This Database only Contains Tsunami Data from 2013 until 2017, you searched for ${year}`}))
+      .catch(error => response.status(500).json({error}))
+  }
+
   database('waves')
     .select()
     .then(wave => response.status(200).json(wave))
@@ -57,21 +60,6 @@ app.get('/api/v1/waves/:id', (request, response) => {
         ? response.status(404).json({ error: 'Could not be found.' })
         : response.status(200).json(wave)))
     .catch(error => response.status(500).json({ error }));
-});
-
-app.get('api/v1/waves?YEAR=:year', (request, response) => {
-  const { year } = request.params;
-  database('waves')
-    .where({ YEAR: year })
-    .select()
-    .then(wave =>
-      (!wave.length
-        ? response
-          .status(404)
-          .json({
-            error: `This Database only Contains Tsunami Data from 2013 until 2017, you searched for ${year}`,
-          })
-        : response.status(200).json(wave)));
 });
 
 app.post('/api/v1/sources/', (request, response) => {

@@ -133,7 +133,7 @@ describe('API Routes', () => {
     });
   });
 
-  describe('GET /api/v1/waves?YEAR=:year', () => {
+  describe('GET /api/v1/waves?year=:year', () => {
     it('should return waves from a specific year', (done) => {
       const mockData = {
         WAVE_ID: '28689',
@@ -150,7 +150,7 @@ describe('API Routes', () => {
 
       chai
         .request(server)
-        .get('/api/v1/waves?YEAR=2013')
+        .get('/api/v1/waves?year=2013')
         .end((error, response) => {
           const index = response.body.findIndex(obj => obj.WAVE_ID === mockData.WAVE_ID);
 
@@ -164,7 +164,7 @@ describe('API Routes', () => {
     it('should return a 404 status if searching for a year that is not between 2013 and 2017', (done) => {
       chai
         .request(server)
-        .get('/api/v1/pizza')
+        .get('/api/v1/waves?year=pizza')
         .end((error, response) => {
           response.should.have.status(404);
           response.body.error.should.equal('This Database only Contains Tsunami Data from 2013 until 2017, you searched for pizza');
