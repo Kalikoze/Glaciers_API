@@ -205,7 +205,7 @@ describe('API Routes', () => {
 				});
 		});
 
-    it('should create a new source when token is in body', (done) => {
+		it('should create a new source when token is in body', (done) => {
 			const mockData = {
 				SOURCE_ID: '5543',
 				YEAR: '221',
@@ -282,18 +282,18 @@ describe('API Routes', () => {
 		});
 
 		it('should create a new wave with token in body', (done) => {
-      const mockData = {
-        WAVE_ID: '41232',
-        SOURCE_ID: '5586',
-        YEAR: '2011',
-        MONTH: '2',
-        LOCATION: 'QUEEN\'S WHARF',
-        MAXIMUM_HEIGHT: '0.07',
-        FATALITIES: '345',
-        FATALITY_ESTIMATE: '3232',
-        ALL_DAMAGE_MILLIONS: '3382',
-        DAMAGE_ESTIMATE: '2',
-      };
+			const mockData = {
+				WAVE_ID: '41232',
+				SOURCE_ID: '5586',
+				YEAR: '2011',
+				MONTH: '2',
+				LOCATION: 'QUEEN\'S WHARF',
+				MAXIMUM_HEIGHT: '0.07',
+				FATALITIES: '345',
+				FATALITY_ESTIMATE: '3232',
+				ALL_DAMAGE_MILLIONS: '3382',
+				DAMAGE_ESTIMATE: '2',
+			};
 
 			chai.request(server)
 				.post('/api/v1/waves')
@@ -391,7 +391,7 @@ describe('API Routes', () => {
 				});
 		});
 
-    it('should update source object when token is in body', (done) => {
+		it('should update source object when token is in body', (done) => {
 			chai.request(server)
 				.patch('/api/v1/sources/5586')
 				.send(Object.assign({}, update, { token }))
@@ -438,7 +438,7 @@ describe('API Routes', () => {
 				});
 		});
 
-    it('should update source object when token is in body', (done) => {
+		it('should update source object when token is in body', (done) => {
 			chai.request(server)
 				.patch('/api/v1/waves/28689')
 				.send(Object.assign({}, update, { token }))

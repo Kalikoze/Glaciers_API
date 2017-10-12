@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 
 const app = express();
@@ -8,9 +9,8 @@ const jwt = require('jsonwebtoken');
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
-const key = require('./key');
 
-const secretKey = process.env.secretKey || key;
+const secretKey = process.env.secretKey;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
