@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.set('port', process.env.PORT || 3000);
 
 const checkAuth = (request, response, next) => {
-  const token = request.headers.authorization || request.body.token;
+  const token = request.headers.authorization || request.body.token || request.query.token;
 
   if (!token) {
     return response.status(403).json({error: 'You must be authorized to hit this endpoint.'})
