@@ -1,5 +1,22 @@
 const postInfo = () => {
-  console.log('fired')
+  const appName = $('#POST-appname').val()
+  const email = $('#POST-email').val()
+
+  if (appName && email) {    
+    fetch('/api/v1/newuser/authenticate', {
+      method: 'POST',
+      body: JSON.stringify({appName, email}),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => response.json())
+    .then(token => appendToken(token, null))
+    .catch(error => appendToken(null, error))
+  }
 }
 
-$('#POST-email').keydown(e => e.keyCode === 13 ? postInfo() : null);
+const appendToken = ({token, error}) => {
+  token ? $('.token').text(`${token}`) : $('.token').text(`${error}`)
+}
+
+$('.submit').click(postInfo);
