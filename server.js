@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.set('port', process.env.PORT || 3000);
 
 const checkAuth = (request, response, next) => {
-  const token = request.headers.authorization;
+  const token = request.headers.authorization || request.body.token || request.query.token;
 
   if (!token) {
     return response.status(403).json({error: 'You must be authorized to hit this endpoint.'})
@@ -98,6 +98,8 @@ app.post('/api/v1/newuser/authenticate', (request, response) => {
 app.post('/api/v1/sources/', checkAuth, (request, response) => {
   const source = request.body;
 
+  delete source.token
+
   const keys = [
     'SOURCE_ID',
     'YEAR',
@@ -130,6 +132,8 @@ app.post('/api/v1/sources/', checkAuth, (request, response) => {
 
 app.post('/api/v1/waves/', checkAuth, (request, response) => {
   const wave = request.body;
+
+  delete wave.token
 
   const keys = [
     'WAVE_ID',
@@ -193,6 +197,8 @@ app.patch('/api/v1/sources/:id', checkAuth, (request, response) => {
   const sourcePatch = request.body;
   const { id } = request.params;
 
+  delete sourcePatch.token
+
   database('sources')
     .where('SOURCE_ID', id)
     .update(sourcePatch, '*')
@@ -210,6 +216,8 @@ app.patch('/api/v1/sources/:id', checkAuth, (request, response) => {
 app.patch('/api/v1/waves/:id', checkAuth, (request, response) => {
   const wavePatch = request.body;
   const { id } = request.params;
+
+  delete wavePatch.token
 
   database('waves')
     .where('WAVE_ID', id)
