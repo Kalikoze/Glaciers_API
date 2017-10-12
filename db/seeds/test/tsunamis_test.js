@@ -17,14 +17,6 @@ const createSource = (knex, source) => {
     ALL_DAMAGE_MILLIONS: source.ALL_DAMAGE_MILLIONS,
     DAMAGE_ESTIMATE: source.DAMAGE_ESTIMATE
   })
-  .then(() => {
-    let wavePromises = [];
-
-    waves.forEach(wave => {
-      wavePromises.push(createWave(knex, wave))
-    });
-    return Promise.all(wavePromises)
-  })
 }
 
 const createWave = (knex, wave) => {
@@ -52,6 +44,14 @@ exports.seed = (knex, Promise) => {
         sourcePromises.push(createSource(knex, source))
       });
       return Promise.all(sourcePromises)
+    })
+    .then(() => {
+      let wavePromises = [];
+
+      waves.forEach(wave => {
+        wavePromises.push(createWave(knex, wave))
+      });
+      return Promise.all(wavePromises)
     })
     .then(() => console.log('Seeding is complete'))
     .catch(error => console.log(`Error seeding data: ${error}`))

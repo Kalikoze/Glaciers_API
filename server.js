@@ -7,6 +7,10 @@ const path = require('path');
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
+const sources = require('./public/assets/filteredSources.json')
+const waves = require('./public/assets/filteredWaves.json')
+
+console.log(waves.length)
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
