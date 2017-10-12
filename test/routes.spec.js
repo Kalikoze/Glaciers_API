@@ -175,23 +175,24 @@ describe('API Routes', () => {
 	});
 
 	describe('POST /api/v1/sources', () => {
-		it('should create a new source when token is in header', (done) => {
-			const mockData = {
-				SOURCE_ID: '5543',
-				YEAR: '221',
-				MONTH: '8',
-				COUNTRY: 'ITALY',
-				STATEPROVINCE: 'Foo',
-				LOCATION: 'Foo',
-				LATITUDE: '41.4',
-				LONGITUDE: '45.3',
-				MAXIMUM_HEIGHT: '21',
-				FATALITIES: '455',
-				FATALITY_ESTIMATE: '21',
-				ALL_DAMAGE_MILLIONS: '4553',
-				DAMAGE_ESTIMATE: '231',
-			};
 
+		const mockData = {
+			SOURCE_ID: '5543',
+			YEAR: '221',
+			MONTH: '8',
+			COUNTRY: 'ITALY',
+			STATEPROVINCE: 'Foo',
+			LOCATION: 'Foo',
+			LATITUDE: '41.4',
+			LONGITUDE: '45.3',
+			MAXIMUM_HEIGHT: '21',
+			FATALITIES: '455',
+			FATALITY_ESTIMATE: '21',
+			ALL_DAMAGE_MILLIONS: '4553',
+			DAMAGE_ESTIMATE: '231',
+		};
+
+		it('should create a new source when token is in header', (done) => {
 			chai.request(server)
 				.post('/api/v1/sources')
 				.set('Authorization', token)
@@ -206,22 +207,6 @@ describe('API Routes', () => {
 		});
 
 		it('should create a new source when token is in body', (done) => {
-			const mockData = {
-				SOURCE_ID: '5543',
-				YEAR: '221',
-				MONTH: '8',
-				COUNTRY: 'ITALY',
-				STATEPROVINCE: 'Foo',
-				LOCATION: 'Foo',
-				LATITUDE: '41.4',
-				LONGITUDE: '45.3',
-				MAXIMUM_HEIGHT: '21',
-				FATALITIES: '455',
-				FATALITY_ESTIMATE: '21',
-				ALL_DAMAGE_MILLIONS: '4553',
-				DAMAGE_ESTIMATE: '231',
-			};
-
 			chai.request(server)
 				.post('/api/v1/sources')
 				.send(Object.assign({}, mockData, {token}))
@@ -230,6 +215,35 @@ describe('API Routes', () => {
 					response.should.have.status(201);
 					response.body.should.be.a('array');
 					response.body[index].should.include(mockData);
+					done();
+				});
+		});
+
+		it('should not create a new source when token is invalid', (done) => {
+			const invalidToken = {
+				'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBOYW1lIjoiY29vbCBhcHAiLCJlbWFpbCI6InRyb2xsNTk5MTBAYW9sLmNvbSIsImFkbWluIjpmYWxzZSwiaWF0IjoxNTA3ODQ3MzY4LCJleHAiOjE1MDgwMjAxNjh9.H7NXB25zC6Yd7KedQ40Sn7hjGX4X4NlUCxGTdYO0zTs'
+			};
+
+			chai.request(server)
+				.post('/api/v1/sources')
+				.set('Authorization', invalidToken)
+				.send(mockData)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('should not create a new source when there is no token', (done) => {
+			chai.request(server)
+				.post('/api/v1/sources')
+				.send(mockData)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('You must be authorized to hit this endpoint.');
 					done();
 				});
 		});
@@ -282,19 +296,6 @@ describe('API Routes', () => {
 		});
 
 		it('should create a new wave with token in body', (done) => {
-			const mockData = {
-				WAVE_ID: '41232',
-				SOURCE_ID: '5586',
-				YEAR: '2011',
-				MONTH: '2',
-				LOCATION: 'QUEEN\'S WHARF',
-				MAXIMUM_HEIGHT: '0.07',
-				FATALITIES: '345',
-				FATALITY_ESTIMATE: '3232',
-				ALL_DAMAGE_MILLIONS: '3382',
-				DAMAGE_ESTIMATE: '2',
-			};
-
 			chai.request(server)
 				.post('/api/v1/waves')
 				.send(Object.assign({}, mockData, {token}))
@@ -303,6 +304,35 @@ describe('API Routes', () => {
 					response.should.have.status(201);
 					response.body.should.be.a('array');
 					response.body[index].should.include(mockData);
+					done();
+				});
+		});
+
+		it('should not create a new wave with invalid token', (done) => {
+			const invalidToken = {
+				'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBOYW1lIjoiY29vbCBhcHAiLCJlbWFpbCI6InRyb2xsNTk5MTBAYW9sLmNvbSIsImFkbWluIjpmYWxzZSwiaWF0IjoxNTA3ODQ3MzY4LCJleHAiOjE1MDgwMjAxNjh9.H7NXB25zC6Yd7KedQ40Sn7hjGX4X4NlUCxGTdYO0zTs'
+			};
+
+			chai.request(server)
+				.post('/api/v1/waves')
+				.set('Authorization', invalidToken)
+				.send(mockData)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('should not create a new wave when there is no token', (done) => {
+			chai.request(server)
+				.post('/api/v1/waves')
+				.send(mockData)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('You must be authorized to hit this endpoint.');
 					done();
 				});
 		});
@@ -336,6 +366,33 @@ describe('API Routes', () => {
 				});
 		});
 
+		it('should not delete a source with invalid token', done => {
+			const invalidToken = {
+				'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBOYW1lIjoiY29vbCBhcHAiLCJlbWFpbCI6InRyb2xsNTk5MTBAYW9sLmNvbSIsImFkbWluIjpmYWxzZSwiaWF0IjoxNTA3ODQ3MzY4LCJleHAiOjE1MDgwMjAxNjh9.H7NXB25zC6Yd7KedQ40Sn7hjGX4X4NlUCxGTdYO0zTs'
+			};
+
+			chai.request(server)
+				.delete('/api/v1/sources/5586')
+				.set('Authorization', invalidToken)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('should not delete a source when there is no token', done => {
+			chai.request(server)
+				.delete('/api/v1/sources/5586')
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('You must be authorized to hit this endpoint.');
+					done();
+				});
+		});
+
 		it('should return a 404 error if an invalid ID is passed', (done) => {
 			chai.request(server)
 				.delete('/api/v1/sources/pizza')
@@ -355,6 +412,33 @@ describe('API Routes', () => {
 				.set('Authorization', token)
 				.end((error, response) => {
 					response.should.have.status(204);
+					done();
+				});
+		});
+
+		it('should not delete a wave with invalid token', done => {
+			const invalidToken = {
+				'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBOYW1lIjoiY29vbCBhcHAiLCJlbWFpbCI6InRyb2xsNTk5MTBAYW9sLmNvbSIsImFkbWluIjpmYWxzZSwiaWF0IjoxNTA3ODQ3MzY4LCJleHAiOjE1MDgwMjAxNjh9.H7NXB25zC6Yd7KedQ40Sn7hjGX4X4NlUCxGTdYO0zTs'
+			};
+
+			chai.request(server)
+				.delete('/api/v1/waves/28689')
+				.set('Authorization', invalidToken)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('should not delete a wave when there is no token', done => {
+			chai.request(server)
+				.delete('/api/v1/waves/28689')
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('You must be authorized to hit this endpoint.');
 					done();
 				});
 		});
@@ -405,6 +489,35 @@ describe('API Routes', () => {
 				});
 		});
 
+		it('should not update source object with invalid token', done => {
+			const invalidToken = {
+				'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBOYW1lIjoiY29vbCBhcHAiLCJlbWFpbCI6InRyb2xsNTk5MTBAYW9sLmNvbSIsImFkbWluIjpmYWxzZSwiaWF0IjoxNTA3ODQ3MzY4LCJleHAiOjE1MDgwMjAxNjh9.H7NXB25zC6Yd7KedQ40Sn7hjGX4X4NlUCxGTdYO0zTs'
+			};
+
+			chai.request(server)
+				.patch('/api/v1/sources/5586')
+				.set('Authorization', invalidToken)
+				.send(update)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('should not update source object when there is no token', done => {
+			chai.request(server)
+				.patch('/api/v1/sources/5586')
+				.send(update)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('You must be authorized to hit this endpoint.');
+					done();
+				});
+		});
+
 		it('should return a 404 error if an invalid ID is passed', (done) => {
 			chai.request(server)
 				.patch('/api/v1/sources/pizza')
@@ -448,6 +561,35 @@ describe('API Routes', () => {
 					response.body.should.have.property('LOCATION');
 					response.body.LOCATION.should.equal('DENVER');
 					response.body.YEAR.should.equal('2013');
+					done();
+				});
+		});
+
+		it('should not update wave object with invalid token', done => {
+			const invalidToken = {
+				'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBOYW1lIjoiY29vbCBhcHAiLCJlbWFpbCI6InRyb2xsNTk5MTBAYW9sLmNvbSIsImFkbWluIjpmYWxzZSwiaWF0IjoxNTA3ODQ3MzY4LCJleHAiOjE1MDgwMjAxNjh9.H7NXB25zC6Yd7KedQ40Sn7hjGX4X4NlUCxGTdYO0zTs'
+			};
+
+			chai.request(server)
+				.patch('/api/v1/waves/28689')
+				.set('Authorization', invalidToken)
+				.send(update)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('should not update wave object when there is no token', done => {
+			chai.request(server)
+				.patch('/api/v1/waves/28689')
+				.send(update)
+				.end((error, response) => {
+					response.should.have.status(403);
+					response.body.should.be.a('object');
+					response.body.error.should.equal('You must be authorized to hit this endpoint.');
 					done();
 				});
 		});
