@@ -32,7 +32,6 @@ An array of objects with the following keys and values:
 - **SOURCE_ID** — Unique id of the wave.
 - **YEAR** — Year the wave hit.
 - **MONTH** — Month the wave hit.
-- **MONTH** — Month the wave hit.
 - **LOCATION** — Location where the wave hit.
 - **MAXIMUM_HEIGHT** — The maximum height wave reached.
 - **FATALITIES** — The number of fatalities caused by this wave.
@@ -62,8 +61,11 @@ Errors 404 and 500 will return in the format:
 **Returns**
 __Below is a shortened example of the response__
 
-``` [
-{
+200 status code
+
+```
+[
+  {
     "WAVE_ID": "28688",
     "SOURCE_ID": "5519",
     "YEAR": "2013",
@@ -76,8 +78,8 @@ __Below is a shortened example of the response__
     "DAMAGE_ESTIMATE": "",
     "created_at": "2017-10-12T23:00:55.589Z",
     "updated_at": "2017-10-12T23:00:55.589Z"
-},
-{
+  },
+  {
     "WAVE_ID": "28728",
     "SOURCE_ID": "5533",
     "YEAR": "2013",
@@ -90,8 +92,8 @@ __Below is a shortened example of the response__
     "DAMAGE_ESTIMATE": "",
     "created_at": "2017-10-12T23:00:55.980Z",
     "updated_at": "2017-10-12T23:00:55.980Z"
-},
-{
+  },
+  {
     "WAVE_ID": "29556",
     "SOURCE_ID": "5555",
     "YEAR": "2014",
@@ -104,5 +106,5 @@ __Below is a shortened example of the response__
     "DAMAGE_ESTIMATE": "",
     "created_at": "2017-10-12T23:00:55.987Z",
     "updated_at": "2017-10-12T23:00:55.987Z"
-}, ...]
+  }, ...]
 ```

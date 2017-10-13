@@ -4,7 +4,7 @@ DELETE sources
 
 ## Description
 
-DELETEs specified tsunami source and all waves originating at the source from the database
+Deletes specified tsunami source and all waves originating at the source from the database
 
 ***
 
@@ -44,4 +44,5 @@ Errors 404 and 500 will return in the format:
 **Returns**
 
 ```
+204 No Content
 ```
