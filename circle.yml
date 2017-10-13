@@ -8,6 +8,13 @@ machine:
   environment:
     DATABASE_URL: postgresql://ubuntu:@127.0.0.1:5432/circle_test
 
+test:
+  pre:
+    - eslint server.js
+    - eslint public/js/scripts.js
+    - eslint test/routes.spec.js
+    - eslint knexfile.js
+
 deployment:
   production:
     branch: master
