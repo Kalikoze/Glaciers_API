@@ -103,7 +103,7 @@ app.post('/api/v1/newuser/authenticate', (request, response) => {
 		: Object.assign(request.body, { admin: false });
 
 	jwt.sign(accountAuth, secretKey, { expiresIn: '48h' }, (error, token) => {
-		token ? response.status(200).json({ token }) : response.status(404).json({ error });
+		token ? response.status(201).json({ token }) : response.status(404).json({ error });
 	});
 });
 
