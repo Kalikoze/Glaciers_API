@@ -35,6 +35,22 @@ const checkAuth = (request, response, next) => {
 	});
 };
 
+app.post('/api/v1/newuser/authenticate', (request, response) => {
+	const { email, appName } = request.body;
+
+	if (!email || !appName) {
+		return response.status(422).json({ error: 'An App Name and Email are required.' });
+	}
+
+	const accountAuth = email.includes('turing.io')
+		? Object.assign(request.body, { admin: true })
+		: Object.assign(request.body, { admin: false });
+
+	jwt.sign(accountAuth, secretKey, { expiresIn: '48h' }, (error, token) => {
+		token ? response.status(201).json({ token }) : response.status(404).json({ error });
+	});
+});
+
 app.get('/api/v1/sources', (request, response) => {
 	database('sources')
 		.select()
@@ -53,6 +69,81 @@ app.get('/api/v1/sources/:id', (request, response) => {
 				!source.length ? response.status(404).json({ error: 'Could not be found.' }) : response.status(200).json(source)
 		)
 		.catch(error => response.status(500).json({ error }));
+});
+
+app.post('/api/v1/sources/', checkAuth, (request, response) => {
+	const source = request.body;
+
+	delete source.token;
+
+	const keys = [
+		'SOURCE_ID',
+		'YEAR',
+		'MONTH',
+		'COUNTRY',
+		'STATEPROVINCE',
+		'LOCATION',
+		'LATITUDE',
+		'LONGITUDE',
+		'MAXIMUM_HEIGHT',
+		'FATALITIES',
+		'FATALITY_ESTIMATE',
+		'ALL_DAMAGE_MILLIONS',
+		'DAMAGE_ESTIMATE'
+	];
+
+	for (const requiredParameter of keys) {
+		if (!source[requiredParameter]) {
+			return response.status(422).send({
+				error: `Expected format: { 'SOURCE_ID': <String>, 'YEAR': <String>, 'MONTH': <String>, 'COUNTRY': <String>, 'STATEPROVINCE': <String>, 'LOCATION': <String>, 'LATITUDE': <string>, 'LONGITUDE': <string>, 'MAXIMUM_HEIGHT': <String>, 'FATALITIES': <string>, 'FATALITY_ESTIMATE': <String>, 'ALL_DAMAGE_MILLIONS': <String>, 'DAMAGE_ESTIMATE': <String> }. You're missing a ${requiredParameter} property.`
+			});
+		}
+	}
+
+	database('sources')
+		.insert(source, '*')
+		.then(source => response.status(201).json(source))
+		.catch(error => response.status(500).json({ error }));
+});
+
+app.patch('/api/v1/sources/:id', checkAuth, (request, response) => {
+	const sourcePatch = request.body;
+	const { id } = request.params;
+
+	delete sourcePatch.token;
+
+	database('sources')
+		.where('SOURCE_ID', id)
+		.update(sourcePatch, '*')
+		.then(update => {
+			if (!update.length) {
+				response.status(404).json({
+					error: `Cannot find Source with ID of ${id}`
+				});
+			}
+			response.status(200).json(update[0]);
+		})
+		.catch(error => response.status(500).json({ error }));
+});
+
+app.delete('/api/v1/sources/:id', checkAuth, (request, response) => {
+	const { id } = request.params;
+
+	database('waves')
+		.where({ SOURCE_ID: id })
+		.del()
+		.then(() => {
+			database('sources')
+				.where({ SOURCE_ID: id })
+				.del()
+				.then(
+					deleted =>
+						!deleted
+							? response.status(404).json({ error: `Cannot find Source with ID of ${id}` })
+							: response.sendStatus(204)
+				)
+				.catch(error => response.status(500).json({ error }));
+		});
 });
 
 app.get('/api/v1/waves', (request, response) => {
@@ -91,57 +182,6 @@ app.get('/api/v1/waves/:id', (request, response) => {
 		.catch(error => response.status(500).json({ error }));
 });
 
-app.post('/api/v1/newuser/authenticate', (request, response) => {
-	const { email, appName } = request.body;
-
-	if (!email || !appName) {
-		return response.status(422).json({ error: 'An App Name and Email are required.' });
-	}
-
-	const accountAuth = email.includes('turing.io')
-		? Object.assign(request.body, { admin: true })
-		: Object.assign(request.body, { admin: false });
-
-	jwt.sign(accountAuth, secretKey, { expiresIn: '48h' }, (error, token) => {
-		token ? response.status(201).json({ token }) : response.status(404).json({ error });
-	});
-});
-
-app.post('/api/v1/sources/', checkAuth, (request, response) => {
-	const source = request.body;
-
-	delete source.token;
-
-	const keys = [
-		'SOURCE_ID',
-		'YEAR',
-		'MONTH',
-		'COUNTRY',
-		'STATEPROVINCE',
-		'LOCATION',
-		'LATITUDE',
-		'LONGITUDE',
-		'MAXIMUM_HEIGHT',
-		'FATALITIES',
-		'FATALITY_ESTIMATE',
-		'ALL_DAMAGE_MILLIONS',
-		'DAMAGE_ESTIMATE'
-	];
-
-	for (const requiredParameter of keys) {
-		if (!source[requiredParameter]) {
-			return response.status(422).send({
-				error: `Expected format: { 'SOURCE_ID': <String>, 'YEAR': <String>, 'MONTH': <String>, 'COUNTRY': <String>, 'STATEPROVINCE': <String>, 'LOCATION': <String>, 'LATITUDE': <string>, 'LONGITUDE': <string>, 'MAXIMUM_HEIGHT': <String>, 'FATALITIES': <string>, 'FATALITY_ESTIMATE': <String>, 'ALL_DAMAGE_MILLIONS': <String>, 'DAMAGE_ESTIMATE': <String> }. You're missing a ${requiredParameter} property.`
-			});
-		}
-	}
-
-	database('sources')
-		.insert(source, '*')
-		.then(source => response.status(201).json(source))
-		.catch(error => response.status(500).json({ error }));
-});
-
 app.post('/api/v1/waves/', checkAuth, (request, response) => {
 	const wave = request.body;
 
@@ -174,59 +214,6 @@ app.post('/api/v1/waves/', checkAuth, (request, response) => {
 		.catch(error => response.status(500).json({ error }));
 });
 
-app.delete('/api/v1/sources/:id', checkAuth, (request, response) => {
-	const { id } = request.params;
-
-	database('waves')
-		.where({ SOURCE_ID: id })
-		.del()
-		.then(() => {
-			database('sources')
-				.where({ SOURCE_ID: id })
-				.del()
-				.then(
-					deleted =>
-						!deleted
-							? response.status(404).json({ error: `Cannot find Source with ID of ${id}` })
-							: response.sendStatus(204)
-				)
-				.catch(error => response.status(500).json({ error }));
-		});
-});
-
-app.delete('/api/v1/waves/:id', checkAuth, (request, response) => {
-	const { id } = request.params;
-
-	database('waves')
-		.where({ WAVE_ID: id })
-		.del()
-		.then(
-			deleted =>
-				!deleted ? response.status(404).json({ error: `Cannot find Wave with ID of ${id}` }) : response.sendStatus(204)
-		)
-		.catch(error => response.status(500).json({ error }));
-});
-
-app.patch('/api/v1/sources/:id', checkAuth, (request, response) => {
-	const sourcePatch = request.body;
-	const { id } = request.params;
-
-	delete sourcePatch.token;
-
-	database('sources')
-		.where('SOURCE_ID', id)
-		.update(sourcePatch, '*')
-		.then(update => {
-			if (!update.length) {
-				response.status(404).json({
-					error: `Cannot find Source with ID of ${id}`
-				});
-			}
-			response.status(200).json(update[0]);
-		})
-		.catch(error => response.status(500).json({ error }));
-});
-
 app.patch('/api/v1/waves/:id', checkAuth, (request, response) => {
 	const wavePatch = request.body;
 	const { id } = request.params;
@@ -244,6 +231,19 @@ app.patch('/api/v1/waves/:id', checkAuth, (request, response) => {
 			}
 			response.status(200).json(update[0]);
 		})
+		.catch(error => response.status(500).json({ error }));
+});
+
+app.delete('/api/v1/waves/:id', checkAuth, (request, response) => {
+	const { id } = request.params;
+
+	database('waves')
+		.where({ WAVE_ID: id })
+		.del()
+		.then(
+			deleted =>
+				!deleted ? response.status(404).json({ error: `Cannot find Wave with ID of ${id}` }) : response.sendStatus(204)
+		)
 		.catch(error => response.status(500).json({ error }));
 });
 
