@@ -31,7 +31,7 @@ const checkAuth = (request, response, next) => {
 			return response.status(403).json({ error: 'Invalid token' });
 		}
 
-		decoded.email.includes('turing.io') ? next() : response.status(403).json({ error: 'Invalid email.' });
+		decoded.admin ? next() : response.status(403).json({ error: 'You must be authorized to hit this endpoint.' });
 	});
 };
 
